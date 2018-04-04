@@ -28,6 +28,10 @@ cmake-build-release/
 # File-based project format
 *.iws
 
+#xml files
+*.xml
+*.iml
+
 # IntelliJ
 out/
 
