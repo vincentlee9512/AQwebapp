@@ -26,18 +26,18 @@
             <table class="table">
                 <tr>
                     <th>Location</th>
-                    <th>pm25</th>
-                    <th>pm10</th>
-                    <th>so2</th>
-                    <th>no2</th>
-                    <th>03</th>
-                    <th>co</th>
-                    <th>bc</th>
+                    <th>coordinates</th>
+                    <th>parameter</th>
+                    <th>value</th>
+                    <th>utc time</th>
                 </tr>
 
-                <tr ng-repeat="data in mapCtrl.datalist">
+                <tr ng-repeat="data in datalist">
                     <td>{{data.location}}</td>
+                    <td>{{data.coordinates.latitude+','+data.coordinates.longitude}}</td>
                     <td>{{data.parameter}}</td>
+                    <td>{{data.value}}</td>
+                    <td>{{data.date.utc}}</td>
                 </tr>
 
 
