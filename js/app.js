@@ -55,8 +55,13 @@
 
     //infoObj is an object with 3 properties: lat, lng, and data that shows on the info window
     function createMarker(infoObj){
+        var latLng = {
+            lat: infoObj.coordinates.latitude,
+            lng: infoObj.coordinates.longitude
+        }
+
         var marker = new google.maps.Marker({
-            position: infoObj,
+            position: latLng,
             map: map,
         });
 
@@ -80,6 +85,21 @@
 ////marker cluster
 
     ////here is just example for marker cluster
+    function createMarkerCluster(formattedArray){
+        var i;
+        var markers = [];
+
+        for(i=0;i<formattedArray.length;i++){
+            var marker = createMarker(formattedArray[i]);
+            markers.push(marker);
+        }
+
+        var markerCluster = new MarkerClusterer(map, markers,
+            {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});
+
+    }
+    /*
+
     var locations = [
         {lat: -31.563910, lng: 147.154312, info: "some data"},
         {lat: -33.718234, lng: 150.363181, info: "some data"},
@@ -112,10 +132,9 @@
         var marker = createMarker(locations[i]);
         markers.push(marker);
     }
+    */
 
 
-    var markerCluster = new MarkerClusterer(map, markers,
-        {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});
 
 /////////////////////////////////////////////////////////////
 
@@ -124,52 +143,23 @@
 
         var mapInfo = {};
 
+        //function this function make request to the Open AQ Platform (measurements API)
         function getData (){
-            var url = 'https://api.openaq.org/v1/measurements?coordinates=' + mapInfo.centerLag + ',' + mapInfo.centerLng + '&radius=' + mapInfo.radius;
-            console.log(url);
+            var url = 'https://api.openaq.org/v1/measurements?limit=10000&coordinates=' + mapInfo.centerLag + ',' + mapInfo.centerLng + '&radius=' + mapInfo.radius;
 
             $http.get(url).success(function (data) {
                 var datalist = data.results;
 
-                $scope.datalist = dataFilter(datalist);
+                var formatedArray = dataFilter(datalist);
 
+                createMarkerCluster(formatedArray);
 
+                $scope.datalist = formatedArray;
             });
 
         }
 
-        function checkCoordExits(obj, datalist){
-            var exist = false;
-
-            for(var i=0;i<datalist.length;i++){
-                if(datalist[i].coordinates.latitude === obj.coordinates.latitude &&
-                    datalist[i].coordinates.longitude === obj.coordinates.longitude
-                ) {
-                    exist = true;
-                }
-            }
-
-            return exist;
-        }
-
-        //check if the parameter of the location exists in the return array
-        function checkParaExist(obj, datalist) {
-            var index = -1; //The index of the parameter of specific location in the dataFilter return array
-
-            for(var i=0; i<datalist; i++){
-                if(datalist[i].coordinates.latitude === obj.coordinates.latitude &&
-                    datalist[i].coordinates.longitude === obj.coordinates.longitude
-                ){
-                    if(datalist[i].parameter === obj.parameter){
-                        index = i;
-                    }
-                }
-            }
-
-             return i;
-        }
-
-
+        //this function format the data in the way we need
         function dataFilter(data){
 
             var returnArr = [];
@@ -191,6 +181,39 @@
             return returnArr;
         }
 
+        //this function check is there an object with same coordinates in the formatted array
+        function checkCoordExits(obj, datalist){
+            var exist = false;
+
+            for(var i=0;i<datalist.length;i++){
+                if(datalist[i].coordinates.latitude === obj.coordinates.latitude &&
+                    datalist[i].coordinates.longitude === obj.coordinates.longitude
+                ) {
+                    exist = true;
+                }
+            }
+
+            return exist;
+        }
+
+        //check if the parameter of the location exists in the formatted array
+        function checkParaExist(obj, datalist) {
+            var index = -1; //The index of the parameter of specific location in the dataFilter return array
+
+            for(var i=0; i<datalist; i++){
+                if(datalist[i].coordinates.latitude === obj.coordinates.latitude &&
+                    datalist[i].coordinates.longitude === obj.coordinates.longitude
+                ){
+                    if(datalist[i].parameter === obj.parameter){
+                        index = i;
+                    }
+                }
+            }
+
+             return i;
+        }
+
+        //check if this new object has a new parameter for a location in the formatted array
         function updatePara(existObj, objNewPara){
             for(var i=0; i<existObj.parameters.length;i++){
                 if(existObj.parameters[i].name === objNewPara.paramenter){
@@ -201,9 +224,8 @@
             return existObj;
         }
 
+        //this function formatting the object when we push the object to the formatted array
         function formatObj(obj){
-
-            console.log(obj.parameter);
 
             var newObj = {};
 
@@ -251,6 +273,7 @@
 
         }
 
+        //this function calculates the distance between 2 coordinates
         function calcDist(lat1, lon1, lat2, lon2){
             var radlat1 = Math.PI * lat1/180;
             var radlat2 = Math.PI * lat2/180;
