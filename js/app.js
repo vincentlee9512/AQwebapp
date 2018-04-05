@@ -201,7 +201,7 @@
 
             console.log(returnArr);
 
-            createMarker();
+            //createMarker();
 
             return returnArr;
         }
