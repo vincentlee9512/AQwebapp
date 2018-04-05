@@ -116,19 +116,8 @@
 
 
     app.controller('MapController', function ($http, $scope) {
-        //control the table filter
-        this.tab = 1;
-
-        this.setTab = function(num){
-            this.tab = num;
-        };
-
-        this.isTab = function (num) {
-            return this.tab === num;
-        };
-
-
-
+        //store the sorting request
+        this.sortRequest = {};
 
         var mapInfo = {};
 
@@ -151,6 +140,46 @@
 
                 $scope.datalist = formattedArray;
             });
+
+        };
+
+        this.onlyShow = function(){
+            var request = this.sortRequest;
+
+            var url = 'https://api.openaq.org/v1/measurements?limit=10000&coordinates=' + mapInfo.centerLag + ',' + mapInfo.centerLng + '&radius=' + mapInfo.radius;
+
+
+            $http.get(url).success(function (data) {
+                var datalist = data.results;
+                var formattedArray = dataFilter(datalist);
+                var validList = [];
+                var i;
+
+                if(request.operator === "largerequal"){
+                    for(i=0;i<formattedArray.length;i++){
+                        if(formattedArray[i].parameters[request.type].value !== "x"){
+                            if(formattedArray[i].parameters[request.type].value >= request.value){
+                                validList.push(formattedArray[i]);
+                            }
+                        }
+                    }
+
+                }else if(request.operator === "lessequal"){
+                    for(i=0;i<formattedArray.length;i++){
+                        if(formattedArray[i].parameters[request.type].value !== "x"){
+                            if(formattedArray[i].parameters[request.type].value <= request.value){
+                                validList.push(formattedArray[i]);
+                            }
+                        }
+                    }
+
+                }else{
+                    window.alert('something went wrong');
+                }
+                console.log(validList);
+                $scope.datalist = validList;
+            });
+
 
         };
 
