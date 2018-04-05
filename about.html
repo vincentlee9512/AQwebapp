@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="page">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>MAP API Testing</title>
+
+    <link href="css/bootstrap.min.css" type="text/css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootswatch/4.0.0/flatly/bootstrap.min.css"
+          crossorigin="anonymous">
+
+</head>
+<body ng-controller="MapController as mapCtrl">
+
+<!--//Start Navigation-->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <a class="navbar-brand" href="index.html">Air Quality Web App</a>
+
+    <div class="collapse navbar-collapse" id="navbarColor01">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="#">About the Project</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+<!--//Navigation-->
+
+<!--Start Main Body -->
+<div class="container" >
+    <h1 class="header">About the Project</h1>
+    <div class="team">
+        <h2>Team Members</h2>
+
+        <!--Vincent Bio-->
+        <div class="jumbotron">
+            <div class="row">
+                <div class="col-4">
+                    <p>picture here</p>
+                </div>
+                <div class="col-lg">
+                    <h1 class="display-6">Vincent Li</h1>
+                    <hr class="my-4">
+                    <p>It uses utility classes for typography and spacing to space content out within the larger container.</p>
+                </div>
+            </div>
+        </div>
+
+        <!--Bobby Bio-->
+        <div class="jumbotron">
+            <div class="row">
+                <div class="col-4">
+                    <p>picture here</p>
+                </div>
+                <div class="col-lg">
+                    <h1 class="display-6">Bobby Martin</h1>
+                    <hr class="my-4">
+                    <p>It uses utility classes for typography and spacing to space content out within the larger container.</p>
+
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+</div>
+
+
+</div>
+<!--Main Body-->
+
+<script type="text/javascript"
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBdr_19KHQ0XHbphpXpRQcHL2XI_Dwzd_w&libraries=places">
+</script>
+
+<script src="https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/markerclusterer.js">
+</script>
+
+
+<script src="js/popper.min.js"></script>
+<script src="js/jquery.min.js"></script>
+<script src="js/bootstrap.bundle.min.js"></script>
+<script src="js/angular.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

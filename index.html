@@ -8,20 +8,39 @@
     <link href="css/bootstrap.min.css" type="text/css" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
 
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootswatch/4.0.0/flatly/bootstrap.min.css"
+          crossorigin="anonymous">
+
 </head>
 <body ng-controller="MapController as mapCtrl">
 
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <a class="navbar-brand" href="#">Air Quality Web App</a>
+
+        <div class="collapse navbar-collapse" id="navbarColor01">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="about.html">About the Project</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
     <div class="container" >
-        <h1>Google Map Testing</h1>
+        <div class="mapContainer">
+            <h1 class="header">Pick a location:</h1>
 
-        <input id="mapsearch" class="controls form-control col-sm-6 col-xs-1" type="text" placeholder="">
+            <input id="mapsearch" class="controls form-control col-sm-6 col-xs-1" type="text" placeholder="">
 
-        <div id="map"></div>
+            <div id="map"></div>
 
-        <div id="info"></div>
+            <div class="alert alert-dismissible alert-secondary">
+                <h4>Your coordinates:</h4>
+                <div id="info"></div>
+            </div>
+            <div id="mapCenter"></div>
 
-        <div id="mapCenter"></div>
-
+        </div>
         <div id="airTable">
             <table class="table">
                 <tr>
