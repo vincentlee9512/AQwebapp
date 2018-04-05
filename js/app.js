@@ -201,8 +201,6 @@
 
             console.log(returnArr);
 
-            //createMarker();
-
             return returnArr;
         }
 
@@ -221,19 +219,19 @@
                     value: "x"
                 },
                 {
-                    name: "pm25",
+                    name: "bc",
                     value: "x"
                 },
                 {
-                    name: "pm25",
+                    name: "o3",
                     value: "x"
                 },
                 {
-                    name: "pm25",
+                    name: "so2",
                     value: "x"
                 },
                 {
-                    name: "pm25",
+                    name: "no2",
                     value: "x"
                 },
             ];
