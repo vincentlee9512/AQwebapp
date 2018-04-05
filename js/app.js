@@ -65,8 +65,17 @@
             map: map,
         });
 
+        var infoStr = "";
+        infoStr += infoObj.location + '<br/>';
+
+        for(var i=0;i<infoObj.parameters.length;i++){
+            if(infoObj.parameters[i].value !== "x"){
+                infoStr += '- ' + infoObj.parameters[i].name + " is " + infoObj.parameters[i].value + "µg/m3"
+            }
+        }
+
         var infoWindow = new google.maps.InfoWindow({
-            content: infoObj.info
+            content: infoStr
         });
 
         google.maps.event.addListener(marker, "mouseover", function(){
