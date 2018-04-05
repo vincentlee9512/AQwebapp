@@ -256,8 +256,8 @@
             var sw = bounds.getSouthWest();
             var centerObj = map.getCenter();
 
-            var strHTML = "North East: " + ne.lat() + ", " + ne.lng() + "<br/>";
-            strHTML += "South West" + sw.lat() + ", " + sw.lng();
+            var strHTML = "North East: " + ne.lat().toFixed(3) + ", " + ne.lng().toFixed(3) + "<br/>";
+            strHTML += "South West: " + sw.lat().toFixed(3) + ", " + sw.lng().toFixed(3);
             $('#info')[0].innerHTML = strHTML;
 
             var distRadius = calcDist(centerObj.lat(), centerObj.lng(), ne.lat(), ne.lng());
