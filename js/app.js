@@ -101,10 +101,12 @@
     }
 
     function removeMarkers(){
+
+
         for(var i=0; i<markers.length;i++){
             markers[i].setMap(null);
         }
-        markers = new Array();
+        markers = [];
     }
 
 
@@ -114,11 +116,24 @@
 
 
     app.controller('MapController', function ($http, $scope) {
+        //control the table filter
+        this.tab = 1;
+
+        this.setTab = function(num){
+            this.tab = num;
+        };
+
+        this.isTab = function (num) {
+            return this.tab === num;
+        };
+
+
+
 
         var mapInfo = {};
 
         //function this function make request to the Open AQ Platform (measurements API)
-        function getData (){
+        function getData(){
             var url = 'https://api.openaq.org/v1/measurements?limit=10000&coordinates=' + mapInfo.centerLag + ',' + mapInfo.centerLng + '&radius=' + mapInfo.radius;
 
             $http.get(url).success(function (data) {
@@ -137,7 +152,296 @@
                 $scope.datalist = formattedArray;
             });
 
-        }
+        };
+
+        //sorting by parameters
+        // 1 = pm2.5 increasing
+        // 2 = pm2.5 decreasing
+        // 3 = pm10 increasing
+        // 4 = pm10 decreasing
+        // 5 = co increasing
+        // 6 = co decreasing
+        // 7 = bc increasing
+        // 8 = bc decreasing
+        // 9 = o3 increasing
+        // 10 = o3 decreasing
+        // 11 = so2 increasing
+        // 12 = so2 decreasing
+        // 13 = no2 increasing
+        // 14 = no2 decreasing
+
+        this.sortList = function(num){
+            var url = 'https://api.openaq.org/v1/measurements?limit=10000&coordinates=' + mapInfo.centerLag + ',' + mapInfo.centerLng + '&radius=' + mapInfo.radius;
+            $http.get(url).success(function (data) {
+                var datalist = data.results;
+                var formattedArray = dataFilter(datalist);
+
+                var sortList = [];
+                var xList = [];
+                var validList = [];
+                var i;
+
+                if(num === 1){
+                    for(i=0;i<formattedArray.length;i++){
+                        if(formattedArray[i].parameters[0].value === 'x'){
+                            xList.push(formattedArray[i]);
+                        }else{
+                            validList.push(formattedArray[i]);
+                        }
+                    }
+
+                    validList.sort(function (a,b) {
+                        if(a.parameters[0].value < b.parameters[0].value){
+                            return -1;
+                        }else{
+                            return 1;
+                        }
+                    });
+
+                    sortList = validList.concat(xList);
+                }else if (num === 2){
+                    for(i=0;i<formattedArray.length;i++){
+                        if(formattedArray[i].parameters[0].value === 'x'){
+                            xList.push(formattedArray[i]);
+                        }else{
+                            validList.push(formattedArray[i]);
+                        }
+                    }
+
+                    validList.sort(function (a,b) {
+                        if(a.parameters[0].value < b.parameters[0].value){
+                            return 1;
+                        }else{
+                            return -1;
+                        }
+                    });
+
+                    sortList = validList.concat(xList);
+                }else if (num === 3){
+                    for(i=0;i<formattedArray.length;i++){
+                        if(formattedArray[i].parameters[1].value === 'x'){
+                            xList.push(formattedArray[i]);
+                        }else{
+                            validList.push(formattedArray[i]);
+                        }
+                    }
+
+                    validList.sort(function (a,b) {
+                        if(a.parameters[1].value < b.parameters[1].value){
+                            return -1;
+                        }else{
+                            return 1;
+                        }
+                    });
+
+                    sortList = validList.concat(xList);
+                }else if (num === 4){
+                    for(i=0;i<formattedArray.length;i++){
+                        if(formattedArray[i].parameters[1].value === 'x'){
+                            xList.push(formattedArray[i]);
+                        }else{
+                            validList.push(formattedArray[i]);
+                        }
+                    }
+
+                    validList.sort(function (a,b) {
+                        if(a.parameters[1].value < b.parameters[1].value){
+                            return 1;
+                        }else{
+                            return -1;
+                        }
+                    });
+
+                    sortList = validList.concat(xList);
+                }else if (num === 5){
+                    for(i=0;i<formattedArray.length;i++){
+                        if(formattedArray[i].parameters[2].value === 'x'){
+                            xList.push(formattedArray[i]);
+                        }else{
+                            validList.push(formattedArray[i]);
+                        }
+                    }
+
+                    validList.sort(function (a,b) {
+                        if(a.parameters[2].value < b.parameters[2].value){
+                            return -1;
+                        }else{
+                            return 1;
+                        }
+                    });
+
+                    sortList = validList.concat(xList);
+                }else if (num === 6){
+                    for(i=0;i<formattedArray.length;i++){
+                        if(formattedArray[i].parameters[2].value === 'x'){
+                            xList.push(formattedArray[i]);
+                        }else{
+                            validList.push(formattedArray[i]);
+                        }
+                    }
+
+                    validList.sort(function (a,b) {
+                        if(a.parameters[2].value < b.parameters[2].value){
+                            return 1;
+                        }else{
+                            return -1;
+                        }
+                    });
+
+                    sortList = validList.concat(xList);
+                }else if (num === 7){
+                    for(i=0;i<formattedArray.length;i++){
+                        if(formattedArray[i].parameters[3].value === 'x'){
+                            xList.push(formattedArray[i]);
+                        }else{
+                            validList.push(formattedArray[i]);
+                        }
+                    }
+
+                    validList.sort(function (a,b) {
+                        if(a.parameters[3].value < b.parameters[3].value){
+                            return -1;
+                        }else{
+                            return 1;
+                        }
+                    });
+
+                    sortList = validList.concat(xList);
+                }else if (num === 8){
+                    for(i=0;i<formattedArray.length;i++){
+                        if(formattedArray[i].parameters[3].value === 'x'){
+                            xList.push(formattedArray[i]);
+                        }else{
+                            validList.push(formattedArray[i]);
+                        }
+                    }
+
+                    validList.sort(function (a,b) {
+                        if(a.parameters[3].value < b.parameters[3].value){
+                            return 1;
+                        }else{
+                            return -1;
+                        }
+                    });
+
+                    sortList = validList.concat(xList);
+                }else if (num === 9){
+                    for(i=0;i<formattedArray.length;i++){
+                        if(formattedArray[i].parameters[4].value === 'x'){
+                            xList.push(formattedArray[i]);
+                        }else{
+                            validList.push(formattedArray[i]);
+                        }
+                    }
+
+                    validList.sort(function (a,b) {
+                        if(a.parameters[4].value < b.parameters[4].value){
+                            return -1;
+                        }else{
+                            return 1;
+                        }
+                    });
+
+                    sortList = validList.concat(xList);
+                }else if (num === 10){
+                    for(i=0;i<formattedArray.length;i++){
+                        if(formattedArray[i].parameters[4].value === 'x'){
+                            xList.push(formattedArray[i]);
+                        }else{
+                            validList.push(formattedArray[i]);
+                        }
+                    }
+
+                    validList.sort(function (a,b) {
+                        if(a.parameters[4].value < b.parameters[4].value){
+                            return 1;
+                        }else{
+                            return -1;
+                        }
+                    });
+
+                    sortList = validList.concat(xList);
+                }else if (num === 11){
+                    for(i=0;i<formattedArray.length;i++){
+                        if(formattedArray[i].parameters[5].value === 'x'){
+                            xList.push(formattedArray[i]);
+                        }else{
+                            validList.push(formattedArray[i]);
+                        }
+                    }
+
+                    validList.sort(function (a,b) {
+                        if(a.parameters[5].value < b.parameters[5].value){
+                            return -1;
+                        }else{
+                            return 1;
+                        }
+                    });
+
+                    sortList = validList.concat(xList);
+                }else if (num === 12){
+                    for(i=0;i<formattedArray.length;i++){
+                        if(formattedArray[i].parameters[5].value === 'x'){
+                            xList.push(formattedArray[i]);
+                        }else{
+                            validList.push(formattedArray[i]);
+                        }
+                    }
+
+                    validList.sort(function (a,b) {
+                        if(a.parameters[5].value < b.parameters[5].value){
+                            return 1;
+                        }else{
+                            return -1;
+                        }
+                    });
+
+                    sortList = validList.concat(xList);
+                }else if (num === 13){
+                    for(i=0;i<formattedArray.length;i++){
+                        if(formattedArray[i].parameters[6].value === 'x'){
+                            xList.push(formattedArray[i]);
+                        }else{
+                            validList.push(formattedArray[i]);
+                        }
+                    }
+
+                    validList.sort(function (a,b) {
+                        if(a.parameters[6].value < b.parameters[6].value){
+                            return -1;
+                        }else{
+                            return 1;
+                        }
+                    });
+
+                    sortList = validList.concat(xList);
+                }else if (num === 14){
+                    for(i=0;i<formattedArray.length;i++){
+                        if(formattedArray[i].parameters[6].value === 'x'){
+                            xList.push(formattedArray[i]);
+                        }else{
+                            validList.push(formattedArray[i]);
+                        }
+                    }
+
+                    validList.sort(function (a,b) {
+                        if(a.parameters[6].value < b.parameters[6].value){
+                            return 1;
+                        }else{
+                            return -1;
+                        }
+                    });
+
+                    sortList = validList.concat(xList);
+                }else{
+                    window.alert('something went wrong, please refresh the page');
+                    console.log(num);
+                }
+
+
+                $scope.datalist = sortList;
+            })
+        };
 
         //this function format the data in the way we need
         function dataFilter(data){
@@ -307,6 +611,7 @@
 
 
     });
+
 
 
 })();
