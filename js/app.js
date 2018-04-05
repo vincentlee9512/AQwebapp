@@ -75,9 +75,6 @@
         return marker;
     }
 
-    //example for these two functions
-    var stPaulmarker = createMarker(stPaul);
-
 ///////////////////////////////////////////////////////////////
 
 ////marker cluster
@@ -130,27 +127,116 @@
         function getData (){
             var url = 'https://api.openaq.org/v1/measurements?coordinates=' + mapInfo.centerLag + ',' + mapInfo.centerLng + '&radius=' + mapInfo.radius;
             console.log(url);
+
             $http.get(url).success(function (data) {
-                $scope.datalist = data.results;
-                console.log($scope.datalist);
+                var datalist = data.results;
+
+                $scope.datalist = dataFilter(datalist);
+
 
             });
-            /*
 
-            $http.get(locaUrl).then(function(response) {
-                var respondCoords = [];
+        }
 
-                locationsData = response.data.results;
+        function checkCoordExits(obj, datalist){
+            var exist = false;
 
-                console.log(locationsData);
-
-                for(i=0;i<locationsData.length;i++){
-                    respondCoords.push(locationsData[i].coordinates);
-
+            for(var i=0;i<datalist.length;i++){
+                if(datalist[i].coordinates.latitude === obj.coordinates.latitude &&
+                    datalist[i].coordinates.longitude === obj.coordinates.longitude
+                ) {
+                    exist = true;
                 }
-            });
+            }
 
-            */
+            return exist;
+        }
+
+        //check if the parameter of the location exists in the return array
+        function checkParaExist(obj, datalist) {
+            var index = -1; //The index of the parameter of specific location in the dataFilter return array
+
+            for(var i=0; i<datalist; i++){
+                if(datalist[i].coordinates.latitude === obj.coordinates.latitude &&
+                    datalist[i].coordinates.longitude === obj.coordinates.longitude
+                ){
+                    if(datalist[i].parameter === obj.parameter){
+                        index = i;
+                    }
+                }
+            }
+
+             return i;
+        }
+
+        function replaceNeeded(obj, datalist, index) {
+
+            if(datalist[index].date.utc < obj.date.utc){
+                return true;
+            }else{
+                return false;
+            }
+        }
+
+        function dataFilter(data){
+
+            var returnArr = [];
+
+            for(var i=0;i<data.length;i++){
+                if(checkCoordExits(data[i],returnArr)){
+                    var index = checkParaExist(data[i],returnArr);
+                    if(index !== -1){
+                        if(replaceNeeded(data[i], returnArr, index)){
+                            returnArr.splice(index, 1, data[i])
+                            //replace 1 element after this index in returnArr with data[i]
+                        }
+                    }else{
+                        returnArr.push(data[i]);
+                    }
+
+                }else{
+                    returnArr.push(data[i]);
+                }
+            }
+
+            console.log(returnArr);
+
+            //createMarker();
+
+            return returnArr;
+        }
+
+        function formatTable(datalist){
+            parameters = [
+                {
+                    name: "pm25",
+                    value: "x"
+                },
+                {
+                    name: "pm10",
+                    value: "x"
+                },
+                {
+                    name: "co",
+                    value: "x"
+                },
+                {
+                    name: "pm25",
+                    value: "x"
+                },
+                {
+                    name: "pm25",
+                    value: "x"
+                },
+                {
+                    name: "pm25",
+                    value: "x"
+                },
+                {
+                    name: "pm25",
+                    value: "x"
+                },
+            ];
         }
 
         function calcDist(lat1, lon1, lat2, lon2){
