@@ -130,11 +130,13 @@
         function getData (){
             var url = 'https://api.openaq.org/v1/measurements?coordinates=' + mapInfo.centerLag + ',' + mapInfo.centerLng + '&radius=' + mapInfo.radius;
             console.log(url);
-            $http.get(url).success(function (data) {
-                $scope.datalist = data.results;
-                console.log($scope.datalist);
 
+            $http.get(url).success(function (data) {
+                var datalist = data.results;
+
+                $scope.datalist = dataFilter(datalist);
             });
+
             /*
 
             $http.get(locaUrl).then(function(response) {
@@ -151,6 +153,73 @@
             });
 
             */
+        }
+
+        function checkCoordExits(obj, datalist){
+            var exist = false;
+
+            for(var i=0;i<datalist.length;i++){
+                if(datalist[i].coordinates.latitude === obj.coordinates.latitude &&
+                    datalist[i].coordinates.longitude === obj.coordinates.longitude
+                ) {
+                    exist = true;
+                }
+            }
+
+            return exist;
+        }
+
+        //check if the parameter of the location exists in the return array
+        function checkParaExist(obj, datalist) {
+            var index = -1; //The index of the parameter of specific location in the dataFilter return array
+
+            for(var i=0; i<datalist; i++){
+                if(datalist[i].coordinates.latitude === obj.coordinates.latitude &&
+                    datalist[i].coordinates.longitude === obj.coordinates.longitude
+                ) {
+                    if(datalist[i].parameter === obj.parameter){
+                        index = i;
+                    }
+                }
+            }
+
+             return i;
+        }
+
+        function replaceNeeded(obj, datalist, index) {
+
+            if(datalist[index].date.utc < obj.date.utc){
+                return true;
+            }else{
+                return false;
+            }
+        }
+
+        function dataFilter(data){
+
+            var returnArr = [];
+
+            for(var i=0;i<data.length;i++){
+                if(checkCoordExits(data[i],returnArr)){
+                    var index = checkParaExist(data[i],returnArr);
+                    if(index !== -1){
+                        if(replaceNeeded(data[i], returnArr, index)){
+                            returnArr.splice(index, 1, data[i])
+                            //replace 1 element after this index in returnArr with data[i]
+                        }
+                    }else{
+                        returnArr.push(data[i]);
+                    }
+
+                }else{
+                    returnArr.push(data[i]);
+                }
+            }
+
+            console.log(returnArr);
+
+
+            return returnArr;
         }
 
         function calcDist(lat1, lon1, lat2, lon2){
