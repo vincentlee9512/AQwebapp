@@ -169,14 +169,6 @@
              return i;
         }
 
-        function replaceNeeded(obj, datalist, index) {
-
-            if(datalist[index].date.utc < obj.date.utc){
-                return true;
-            }else{
-                return false;
-            }
-        }
 
         function dataFilter(data){
 
@@ -186,26 +178,36 @@
                 if(checkCoordExits(data[i],returnArr)){
                     var index = checkParaExist(data[i],returnArr);
                     if(index !== -1){
-                        if(replaceNeeded(data[i], returnArr, index)){
-                            returnArr.splice(index, 1, data[i])
-                            //replace 1 element after this index in returnArr with data[i]
-                        }
+                        //no need for update based on the date, because the response data is order from latest to oldest
+                        //which means the first value of a parameter we get is the latest one.
                     }else{
-                        returnArr.push(data[i]);
+                        returnArr[index] = updatePara(returnArr[index], data[i]);
                     }
-
                 }else{
-                    returnArr.push(data[i]);
+                    returnArr.push(formatObj(data[i]));
                 }
             }
-
-            console.log(returnArr);
 
             return returnArr;
         }
 
-        function formatTable(datalist){
-            parameters = [
+        function updatePara(existObj, objNewPara){
+            for(var i=0; i<existObj.parameters.length;i++){
+                if(existObj.parameters[i].name === objNewPara.paramenter){
+                    newObj.parameters[i].value = obj.value;
+                }
+            }
+
+            return existObj;
+        }
+
+        function formatObj(obj){
+
+            console.log(obj.parameter);
+
+            var newObj = {};
+
+            newObj.parameters = [
                 {
                     name: "pm25",
                     value: "x"
@@ -235,6 +237,18 @@
                     value: "x"
                 },
             ];
+
+            newObj.location = obj.location;
+
+            newObj.coordinates = obj.coordinates;
+
+            for(var i=0; i<newObj.parameters.length;i++) {
+                if (newObj.parameters[i].name === obj.parameter) {
+                    newObj.parameters[i].value = obj.value;
+                }
+            }
+            return newObj;
+
         }
 
         function calcDist(lat1, lon1, lat2, lon2){
