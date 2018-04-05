@@ -75,9 +75,6 @@
         return marker;
     }
 
-    //example for these two functions
-    var stPaulmarker = createMarker(stPaul);
-
 ///////////////////////////////////////////////////////////////
 
 ////marker cluster
@@ -135,24 +132,10 @@
                 var datalist = data.results;
 
                 $scope.datalist = dataFilter(datalist);
+
+
             });
 
-            /*
-
-            $http.get(locaUrl).then(function(response) {
-                var respondCoords = [];
-
-                locationsData = response.data.results;
-
-                console.log(locationsData);
-
-                for(i=0;i<locationsData.length;i++){
-                    respondCoords.push(locationsData[i].coordinates);
-
-                }
-            });
-
-            */
         }
 
         function checkCoordExits(obj, datalist){
@@ -176,7 +159,7 @@
             for(var i=0; i<datalist; i++){
                 if(datalist[i].coordinates.latitude === obj.coordinates.latitude &&
                     datalist[i].coordinates.longitude === obj.coordinates.longitude
-                ) {
+                ){
                     if(datalist[i].parameter === obj.parameter){
                         index = i;
                     }
@@ -218,8 +201,42 @@
 
             console.log(returnArr);
 
+            createMarker();
 
             return returnArr;
+        }
+
+        function formatTable(datalist){
+            parameters = [
+                {
+                    name: "pm25",
+                    value: "x"
+                },
+                {
+                    name: "pm10",
+                    value: "x"
+                },
+                {
+                    name: "co",
+                    value: "x"
+                },
+                {
+                    name: "pm25",
+                    value: "x"
+                },
+                {
+                    name: "pm25",
+                    value: "x"
+                },
+                {
+                    name: "pm25",
+                    value: "x"
+                },
+                {
+                    name: "pm25",
+                    value: "x"
+                },
+            ];
         }
 
         function calcDist(lat1, lon1, lat2, lon2){
