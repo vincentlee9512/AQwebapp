@@ -56,8 +56,8 @@
         <button ng-click="mapCtrl.sortList(13);">no2 increasing</button>
         <button ng-click="mapCtrl.sortList(14);">no2 decreasing</button>
 
-        <form ng-submit="mapCtrl.onlyShow();">
-            <select ng-model="mapCtrl.sortRequest.type">
+        <form ng-submit="mapCtrl.onlyShow();" novalidate>
+            <select ng-model="mapCtrl.sortRequest.type" required>
                 <option value="0">pm2.5</option>
                 <option value="1">pm10</option>
                 <option value="2">co</option>
@@ -67,12 +67,27 @@
                 <option value="6">no2</option>
             </select>
 
-            <select ng-model="mapCtrl.sortRequest.operator">
+            <select ng-model="mapCtrl.sortRequest.operator" required>
                 <option value="largerequal"> >= </option>
                 <option value="lessequal"> <= </option>
             </select>
 
-            <input ng-model="mapCtrl.sortRequest.value" type="number">
+            <input ng-model="mapCtrl.sortRequest.value" type="number" required>
+
+            <button type="sumbit" value="submit" >show</button>
+            <button value="reset" ng-click="mapCtrl.sortRequest = {};">reset</button>
+        </form>
+
+        <form ng-submit="mapCtrl.l">
+            <input type="text" id="loca" disabled>
+            <span>Latitude: </span>
+            <input type="text" id="coordLat" disabled>
+            <span>Longitude: </span>
+            <input type="text" id="coordLng" disabled>
+            <span>Start: </span>
+            <input type="date" id="dateStarts">
+            <span>End: </span>
+            <input type="date" id="dateEnds">
 
             <button type="sumbit" value="submit" >show</button>
             <button value="reset" ng-click="mapCtrl.sortRequest = {};">reset</button>

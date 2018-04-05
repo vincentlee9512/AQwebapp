@@ -119,6 +119,8 @@
         //store the sorting request
         this.sortRequest = {};
 
+        this.requestLoca = {};
+
         var mapInfo = {};
 
         //function this function make request to the Open AQ Platform (measurements API)
@@ -141,8 +143,9 @@
                 $scope.datalist = formattedArray;
             });
 
-        };
+        }
 
+        //sorting based by measurements
         this.onlyShow = function(){
             var request = this.sortRequest;
 
