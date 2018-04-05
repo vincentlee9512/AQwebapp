@@ -27,6 +27,8 @@
     </nav>
 
     <div class="container" >
+
+        <!--Start Map Container-->
         <div class="mapContainer">
             <h1 class="header">Pick a location:</h1>
 
@@ -39,16 +41,51 @@
                 <div id="info"></div>
             </div>
             <div id="mapCenter"></div>
-
         </div>
+
+        <!--Start Data Filters-->
+        <div id="dataFilters">
+            <h5>Filter Data:</h5>
+            <div class="row">
+                <div class="col-5">
+                    <!--<label for="particles">By Particle</label>-->
+                    <select class="form-control" id="particles">
+                        <option value="pm25">pm25</option>
+                        <option value="pm10">pm10</option>
+                        <option value="so2">so2</option>
+                        <option value="no2">no2</option>
+                        <option value="o3">o3</option>
+                        <option value="co">co</option>
+                        <option value="bc">bc</option>
+                    </select>
+                </div>
+    
+                <div class="col-2">
+                    <select name="equation" id="equation" class="form-control">
+                        <option value="greater">&#62; (greater than)</option>
+                        <option value="equal">&#61;(equal)</option>
+                        <option value="less">&#60; (less than)</option>
+                    </select>
+                </div>
+                
+                <div class="col-2">
+                    <input type="text" class="form-control" placeholder="Value">
+                </div>
+                <div class="col-1">
+                    <button type="button" class="btn btn-info">Filter!</button>
+                </div>
+            </div>
+        </div>
+
+        <!--Start Data Table-->
         <div id="airTable">
             <table class="table">
                 <tr>
                     <th>Location</th>
-                    <th>coordinates</th>
-                    <th>parameter</th>
-                    <th>value</th>
-                    <th>utc time</th>
+                    <th>Coordinates</th>
+                    <th>Parameter</th>
+                    <th>Value</th>
+                    <th>Utc time</th>
                 </tr>
 
                 <tr ng-repeat="data in datalist">
@@ -58,7 +95,6 @@
                     <td>{{data.value}}</td>
                     <td>{{data.date.utc}}</td>
                 </tr>
-
 
             </table>
         </div>
