@@ -53,22 +53,37 @@
 
 // create map markers and marker's info window
 
-    //infoObj is an object with 3 properties: lat, lng, and data that shows on the info window
-    function createMarker(infoObj){
+    var markers = [];
+
+    function createMarker(infoObj) {
+        var latLng = {
+            lat: infoObj.coordinates.latitude,
+            lng: infoObj.coordinates.longitude
+        }
+
         var marker = new google.maps.Marker({
-            position: infoObj,
+            position: latLng,
             map: map,
         });
 
+        var infoStr = "";
+        infoStr += infoObj.location + '<br/>';
+
+        for (var i = 0; i < infoObj.parameters.length; i++) {
+            if (infoObj.parameters[i].value !== "x") {
+                infoStr += '- ' + infoObj.parameters[i].name + " is " + infoObj.parameters[i].value + "µg/m3"
+            }
+        }
+
         var infoWindow = new google.maps.InfoWindow({
-            content: infoObj.info
+            content: infoStr
         });
 
-        google.maps.event.addListener(marker, "mouseover", function(){
+        google.maps.event.addListener(marker, "mouseover", function () {
             infoWindow.open(map, marker);
         });
 
-        google.maps.event.addListener(marker, 'mouseout', function(){
+        google.maps.event.addListener(marker, 'mouseout', function () {
             infoWindow.close();
         });
 
@@ -80,64 +95,409 @@
 ////marker cluster
 
     ////here is just example for marker cluster
-    var locations = [
-        {lat: -31.563910, lng: 147.154312, info: "some data"},
-        {lat: -33.718234, lng: 150.363181, info: "some data"},
-        {lat: -33.727111, lng: 150.371124, info: "some data"},
-        {lat: -33.848588, lng: 151.209834, info: "some data"},
-        {lat: -33.851702, lng: 151.216968, info: "some data"},
-        {lat: -34.671264, lng: 150.863657, info: "some data"},
-        {lat: -35.304724, lng: 148.662905, info: "some data"},
-        {lat: -36.817685, lng: 175.699196, info: "some data"},
-        {lat: -36.828611, lng: 175.790222, info: "some data"},
-        {lat: -37.750000, lng: 145.116667, info: "some data"},
-        {lat: -37.759859, lng: 145.128708, info: "some data"},
-        {lat: -37.765015, lng: 145.133858, info: "some data"},
-        {lat: -37.770104, lng: 145.143299, info: "some data"},
-        {lat: -37.773700, lng: 145.145187, info: "some data"},
-        {lat: -37.774785, lng: 145.137978, info: "some data"},
-        {lat: -37.819616, lng: 144.968119, info: "some data"},
-        {lat: -38.330766, lng: 144.695692, info: "some data"},
-        {lat: -39.927193, lng: 175.053218, info: "some data"},
-        {lat: -41.330162, lng: 174.865694, info: "some data"},
-        {lat: -42.734358, lng: 147.439506, info: "some data"},
-        {lat: -42.734358, lng: 147.501315, info: "some data"},
-        {lat: -42.735258, lng: 147.438000, info: "some data"},
-        {lat: -43.999792, lng: 170.463352, info: "some data"}
-    ];
+    function createMarkerCluster(){
+        var markerCluster = new MarkerClusterer(map, markers,
+            {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});
+    }
 
-    var i;
-    var markers = [];
-    for(i=0;i<locations.length;i++){
-        var marker = createMarker(locations[i]);
-        markers.push(marker);
+    function removeMarkers(){
+
+
+        for(var i=0; i<markers.length;i++){
+            markers[i].setMap(null);
+        }
+        markers = [];
     }
 
 
-    var markerCluster = new MarkerClusterer(map, markers,
-        {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});
+
 
 /////////////////////////////////////////////////////////////
 
 
     app.controller('MapController', function ($http, $scope) {
+        //store the sorting request
+        this.sortRequest = {};
+
+        this.requestLoca = {};
 
         var mapInfo = {};
 
-        function getData (){
-            var url = 'https://api.openaq.org/v1/measurements?coordinates=' + mapInfo.centerLag + ',' + mapInfo.centerLng + '&radius=' + mapInfo.radius;
-            console.log(url);
+        //function this function make request to the Open AQ Platform (measurements API)
+        function getData(){
+            var url = 'https://api.openaq.org/v1/measurements?limit=10000&coordinates=' + mapInfo.centerLag + ',' + mapInfo.centerLng + '&radius=' + mapInfo.radius;
 
             $http.get(url).success(function (data) {
                 var datalist = data.results;
+                var formattedArray = dataFilter(datalist);
 
-                $scope.datalist = dataFilter(datalist);
+                removeMarkers();
 
+                for(var i=0;i<formattedArray.length;i++){
+                    var marker = createMarker(formattedArray[i]);
+                    markers.push(marker);
+                }
 
+                createMarkerCluster();
+
+                $scope.datalist = formattedArray;
             });
 
         }
 
+        //sorting based by measurements
+        this.onlyShow = function(){
+            var request = this.sortRequest;
+
+            var url = 'https://api.openaq.org/v1/measurements?limit=10000&coordinates=' + mapInfo.centerLag + ',' + mapInfo.centerLng + '&radius=' + mapInfo.radius;
+
+
+            $http.get(url).success(function (data) {
+                var datalist = data.results;
+                var formattedArray = dataFilter(datalist);
+                var validList = [];
+                var i;
+
+                if(request.operator === "largerequal"){
+                    for(i=0;i<formattedArray.length;i++){
+                        if(formattedArray[i].parameters[request.type].value !== "x"){
+                            if(formattedArray[i].parameters[request.type].value >= request.value){
+                                validList.push(formattedArray[i]);
+                            }
+                        }
+                    }
+
+                }else if(request.operator === "lessequal"){
+                    for(i=0;i<formattedArray.length;i++){
+                        if(formattedArray[i].parameters[request.type].value !== "x"){
+                            if(formattedArray[i].parameters[request.type].value <= request.value){
+                                validList.push(formattedArray[i]);
+                            }
+                        }
+                    }
+
+                }else{
+                    window.alert('something went wrong');
+                }
+                console.log(validList);
+                $scope.datalist = validList;
+            });
+
+
+        };
+
+        //sorting by parameters
+        // 1 = pm2.5 increasing
+        // 2 = pm2.5 decreasing
+        // 3 = pm10 increasing
+        // 4 = pm10 decreasing
+        // 5 = co increasing
+        // 6 = co decreasing
+        // 7 = bc increasing
+        // 8 = bc decreasing
+        // 9 = o3 increasing
+        // 10 = o3 decreasing
+        // 11 = so2 increasing
+        // 12 = so2 decreasing
+        // 13 = no2 increasing
+        // 14 = no2 decreasing
+
+        this.sortList = function(num){
+            var url = 'https://api.openaq.org/v1/measurements?limit=10000&coordinates=' + mapInfo.centerLag + ',' + mapInfo.centerLng + '&radius=' + mapInfo.radius;
+            $http.get(url).success(function (data) {
+                var datalist = data.results;
+                var formattedArray = dataFilter(datalist);
+
+                var sortList = [];
+                var xList = [];
+                var validList = [];
+                var i;
+
+                if(num === 1){
+                    for(i=0;i<formattedArray.length;i++){
+                        if(formattedArray[i].parameters[0].value === 'x'){
+                            xList.push(formattedArray[i]);
+                        }else{
+                            validList.push(formattedArray[i]);
+                        }
+                    }
+
+                    validList.sort(function (a,b) {
+                        if(a.parameters[0].value < b.parameters[0].value){
+                            return -1;
+                        }else{
+                            return 1;
+                        }
+                    });
+
+                    sortList = validList.concat(xList);
+                }else if (num === 2){
+                    for(i=0;i<formattedArray.length;i++){
+                        if(formattedArray[i].parameters[0].value === 'x'){
+                            xList.push(formattedArray[i]);
+                        }else{
+                            validList.push(formattedArray[i]);
+                        }
+                    }
+
+                    validList.sort(function (a,b) {
+                        if(a.parameters[0].value < b.parameters[0].value){
+                            return 1;
+                        }else{
+                            return -1;
+                        }
+                    });
+
+                    sortList = validList.concat(xList);
+                }else if (num === 3){
+                    for(i=0;i<formattedArray.length;i++){
+                        if(formattedArray[i].parameters[1].value === 'x'){
+                            xList.push(formattedArray[i]);
+                        }else{
+                            validList.push(formattedArray[i]);
+                        }
+                    }
+
+                    validList.sort(function (a,b) {
+                        if(a.parameters[1].value < b.parameters[1].value){
+                            return -1;
+                        }else{
+                            return 1;
+                        }
+                    });
+
+                    sortList = validList.concat(xList);
+                }else if (num === 4){
+                    for(i=0;i<formattedArray.length;i++){
+                        if(formattedArray[i].parameters[1].value === 'x'){
+                            xList.push(formattedArray[i]);
+                        }else{
+                            validList.push(formattedArray[i]);
+                        }
+                    }
+
+                    validList.sort(function (a,b) {
+                        if(a.parameters[1].value < b.parameters[1].value){
+                            return 1;
+                        }else{
+                            return -1;
+                        }
+                    });
+
+                    sortList = validList.concat(xList);
+                }else if (num === 5){
+                    for(i=0;i<formattedArray.length;i++){
+                        if(formattedArray[i].parameters[2].value === 'x'){
+                            xList.push(formattedArray[i]);
+                        }else{
+                            validList.push(formattedArray[i]);
+                        }
+                    }
+
+                    validList.sort(function (a,b) {
+                        if(a.parameters[2].value < b.parameters[2].value){
+                            return -1;
+                        }else{
+                            return 1;
+                        }
+                    });
+
+                    sortList = validList.concat(xList);
+                }else if (num === 6){
+                    for(i=0;i<formattedArray.length;i++){
+                        if(formattedArray[i].parameters[2].value === 'x'){
+                            xList.push(formattedArray[i]);
+                        }else{
+                            validList.push(formattedArray[i]);
+                        }
+                    }
+
+                    validList.sort(function (a,b) {
+                        if(a.parameters[2].value < b.parameters[2].value){
+                            return 1;
+                        }else{
+                            return -1;
+                        }
+                    });
+
+                    sortList = validList.concat(xList);
+                }else if (num === 7){
+                    for(i=0;i<formattedArray.length;i++){
+                        if(formattedArray[i].parameters[3].value === 'x'){
+                            xList.push(formattedArray[i]);
+                        }else{
+                            validList.push(formattedArray[i]);
+                        }
+                    }
+
+                    validList.sort(function (a,b) {
+                        if(a.parameters[3].value < b.parameters[3].value){
+                            return -1;
+                        }else{
+                            return 1;
+                        }
+                    });
+
+                    sortList = validList.concat(xList);
+                }else if (num === 8){
+                    for(i=0;i<formattedArray.length;i++){
+                        if(formattedArray[i].parameters[3].value === 'x'){
+                            xList.push(formattedArray[i]);
+                        }else{
+                            validList.push(formattedArray[i]);
+                        }
+                    }
+
+                    validList.sort(function (a,b) {
+                        if(a.parameters[3].value < b.parameters[3].value){
+                            return 1;
+                        }else{
+                            return -1;
+                        }
+                    });
+
+                    sortList = validList.concat(xList);
+                }else if (num === 9){
+                    for(i=0;i<formattedArray.length;i++){
+                        if(formattedArray[i].parameters[4].value === 'x'){
+                            xList.push(formattedArray[i]);
+                        }else{
+                            validList.push(formattedArray[i]);
+                        }
+                    }
+
+                    validList.sort(function (a,b) {
+                        if(a.parameters[4].value < b.parameters[4].value){
+                            return -1;
+                        }else{
+                            return 1;
+                        }
+                    });
+
+                    sortList = validList.concat(xList);
+                }else if (num === 10){
+                    for(i=0;i<formattedArray.length;i++){
+                        if(formattedArray[i].parameters[4].value === 'x'){
+                            xList.push(formattedArray[i]);
+                        }else{
+                            validList.push(formattedArray[i]);
+                        }
+                    }
+
+                    validList.sort(function (a,b) {
+                        if(a.parameters[4].value < b.parameters[4].value){
+                            return 1;
+                        }else{
+                            return -1;
+                        }
+                    });
+
+                    sortList = validList.concat(xList);
+                }else if (num === 11){
+                    for(i=0;i<formattedArray.length;i++){
+                        if(formattedArray[i].parameters[5].value === 'x'){
+                            xList.push(formattedArray[i]);
+                        }else{
+                            validList.push(formattedArray[i]);
+                        }
+                    }
+
+                    validList.sort(function (a,b) {
+                        if(a.parameters[5].value < b.parameters[5].value){
+                            return -1;
+                        }else{
+                            return 1;
+                        }
+                    });
+
+                    sortList = validList.concat(xList);
+                }else if (num === 12){
+                    for(i=0;i<formattedArray.length;i++){
+                        if(formattedArray[i].parameters[5].value === 'x'){
+                            xList.push(formattedArray[i]);
+                        }else{
+                            validList.push(formattedArray[i]);
+                        }
+                    }
+
+                    validList.sort(function (a,b) {
+                        if(a.parameters[5].value < b.parameters[5].value){
+                            return 1;
+                        }else{
+                            return -1;
+                        }
+                    });
+
+                    sortList = validList.concat(xList);
+                }else if (num === 13){
+                    for(i=0;i<formattedArray.length;i++){
+                        if(formattedArray[i].parameters[6].value === 'x'){
+                            xList.push(formattedArray[i]);
+                        }else{
+                            validList.push(formattedArray[i]);
+                        }
+                    }
+
+                    validList.sort(function (a,b) {
+                        if(a.parameters[6].value < b.parameters[6].value){
+                            return -1;
+                        }else{
+                            return 1;
+                        }
+                    });
+
+                    sortList = validList.concat(xList);
+                }else if (num === 14){
+                    for(i=0;i<formattedArray.length;i++){
+                        if(formattedArray[i].parameters[6].value === 'x'){
+                            xList.push(formattedArray[i]);
+                        }else{
+                            validList.push(formattedArray[i]);
+                        }
+                    }
+
+                    validList.sort(function (a,b) {
+                        if(a.parameters[6].value < b.parameters[6].value){
+                            return 1;
+                        }else{
+                            return -1;
+                        }
+                    });
+
+                    sortList = validList.concat(xList);
+                }else{
+                    window.alert('something went wrong, please refresh the page');
+                    console.log(num);
+                }
+
+
+                $scope.datalist = sortList;
+            })
+        };
+
+        //this function format the data in the way we need
+        function dataFilter(data){
+
+            var returnArr = [];
+
+            for(var i=0;i<data.length;i++){
+                if(checkCoordExits(data[i],returnArr)){
+                    var index = checkParaExist(data[i],returnArr);
+                    if(index !== -1){
+                        //no need for update based on the date, because the response data is order from latest to oldest
+                        //which means the first value of a parameter we get is the latest one.
+                    }else{
+                        returnArr[index] = updatePara(returnArr[index], data[i]);
+                    }
+                }else{
+                    returnArr.push(formatObj(data[i]));
+                }
+            }
+
+            return returnArr;
+        }
+
+        //this function check is there an object with same coordinates in the formatted array
         function checkCoordExits(obj, datalist){
             var exist = false;
 
@@ -152,7 +512,7 @@
             return exist;
         }
 
-        //check if the parameter of the location exists in the return array
+        //check if the parameter of the location exists in the formatted array
         function checkParaExist(obj, datalist) {
             var index = -1; //The index of the parameter of specific location in the dataFilter return array
 
@@ -169,45 +529,23 @@
              return i;
         }
 
-        function replaceNeeded(obj, datalist, index) {
-
-            if(datalist[index].date.utc < obj.date.utc){
-                return true;
-            }else{
-                return false;
-            }
-        }
-
-        function dataFilter(data){
-
-            var returnArr = [];
-
-            for(var i=0;i<data.length;i++){
-                if(checkCoordExits(data[i],returnArr)){
-                    var index = checkParaExist(data[i],returnArr);
-                    if(index !== -1){
-                        if(replaceNeeded(data[i], returnArr, index)){
-                            returnArr.splice(index, 1, data[i])
-                            //replace 1 element after this index in returnArr with data[i]
-                        }
-                    }else{
-                        returnArr.push(data[i]);
-                    }
-
-                }else{
-                    returnArr.push(data[i]);
+        //check if this new object has a new parameter for a location in the formatted array
+        function updatePara(existObj, objNewPara){
+            for(var i=0; i<existObj.parameters.length;i++){
+                if(existObj.parameters[i].name === objNewPara.paramenter){
+                    newObj.parameters[i].value = obj.value;
                 }
             }
 
-            console.log(returnArr);
-
-            //createMarker();
-
-            return returnArr;
+            return existObj;
         }
 
-        function formatTable(datalist){
-            parameters = [
+        //this function formatting the object when we push the object to the formatted array
+        function formatObj(obj){
+
+            var newObj = {};
+
+            newObj.parameters = [
                 {
                     name: "pm25",
                     value: "x"
@@ -221,24 +559,37 @@
                     value: "x"
                 },
                 {
-                    name: "pm25",
+                    name: "bc",
                     value: "x"
                 },
                 {
-                    name: "pm25",
+                    name: "o3",
                     value: "x"
                 },
                 {
-                    name: "pm25",
+                    name: "so2",
                     value: "x"
                 },
                 {
-                    name: "pm25",
+                    name: "no2",
                     value: "x"
                 },
             ];
+
+            newObj.location = obj.location;
+
+            newObj.coordinates = obj.coordinates;
+
+            for(var i=0; i<newObj.parameters.length;i++) {
+                if (newObj.parameters[i].name === obj.parameter) {
+                    newObj.parameters[i].value = obj.value;
+                }
+            }
+            return newObj;
+
         }
 
+        //this function calculates the distance between 2 coordinates
         function calcDist(lat1, lon1, lat2, lon2){
             var radlat1 = Math.PI * lat1/180;
             var radlat2 = Math.PI * lat2/180;
@@ -292,6 +643,7 @@
 
 
     });
+
 
 
 })();

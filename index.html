@@ -27,8 +27,6 @@
     </nav>
 
     <div class="container" >
-
-        <!--Start Map Container-->
         <div class="mapContainer">
             <h1 class="header">Pick a location:</h1>
 
@@ -41,60 +39,69 @@
                 <div id="info"></div>
             </div>
             <div id="mapCenter"></div>
-        </div>
 
-        <!--Start Data Filters-->
-        <div id="dataFilters">
-            <h5>Filter Data:</h5>
-            <div class="row">
-                <div class="col-5">
-                    <!--<label for="particles">By Particle</label>-->
-                    <select class="form-control" id="particles">
-                        <option value="pm25">pm25</option>
-                        <option value="pm10">pm10</option>
-                        <option value="so2">so2</option>
-                        <option value="no2">no2</option>
-                        <option value="o3">o3</option>
-                        <option value="co">co</option>
-                        <option value="bc">bc</option>
-                    </select>
-                </div>
-    
-                <div class="col-2">
-                    <select name="equation" id="equation" class="form-control">
-                        <option value="greater">&#62; (greater than)</option>
-                        <option value="equal">&#61;(equal)</option>
-                        <option value="less">&#60; (less than)</option>
-                    </select>
-                </div>
-                
-                <div class="col-2">
-                    <input type="text" class="form-control" placeholder="Value">
-                </div>
-                <div class="col-1">
-                    <button type="button" class="btn btn-info">Filter!</button>
-                </div>
-            </div>
         </div>
+        <button ng-click="mapCtrl.sortList(1);">pm2.5 increasing</button>
+        <button ng-click="mapCtrl.sortList(2);">pm2.5 decreasing</button>
+        <button ng-click="mapCtrl.sortList(3);">pm10 increasing</button>
+        <button ng-click="mapCtrl.sortList(4);">pm10 decreasing</button>
+        <button ng-click="mapCtrl.sortList(5);">co increasing</button>
+        <button ng-click="mapCtrl.sortList(6);">co decreasing</button>
+        <button ng-click="mapCtrl.sortList(7);">bc increasing</button>
+        <button ng-click="mapCtrl.sortList(8);">bc decreasing</button>
+        <button ng-click="mapCtrl.sortList(9);">o3 increasing</button>
+        <button ng-click="mapCtrl.sortList(10);">o3 decreasing</button>
+        <button ng-click="mapCtrl.sortList(11);">so2 increasing</button>
+        <button ng-click="mapCtrl.sortList(12);">so2 decreasing</button>
+        <button ng-click="mapCtrl.sortList(13);">no2 increasing</button>
+        <button ng-click="mapCtrl.sortList(14);">no2 decreasing</button>
 
-        <!--Start Data Table-->
+        <form ng-submit="mapCtrl.onlyShow();" novalidate>
+            <select ng-model="mapCtrl.sortRequest.type" required>
+                <option value="0">pm2.5</option>
+                <option value="1">pm10</option>
+                <option value="2">co</option>
+                <option value="3">bc</option>
+                <option value="4">o3</option>
+                <option value="5">so2</option>
+                <option value="6">no2</option>
+            </select>
+
+            <select ng-model="mapCtrl.sortRequest.operator" required>
+                <option value="largerequal"> >= </option>
+                <option value="lessequal"> <= </option>
+            </select>
+
+            <input ng-model="mapCtrl.sortRequest.value" type="number" required>
+
+            <button type="sumbit" value="submit" >show</button>
+            <button value="reset" ng-click="mapCtrl.sortRequest = {};">reset</button>
+        </form>
+
         <div id="airTable">
             <table class="table">
                 <tr>
                     <th>Location</th>
-                    <th>Coordinates</th>
-                    <th>Parameter</th>
-                    <th>Value</th>
-                    <th>Utc time</th>
+                    <th>pm2.5</th>
+                    <th>pm10</th>
+                    <th>co</th>
+                    <th>bc</th>
+                    <th>o3</th>
+                    <th>so2</th>
+                    <th>no2</th>
                 </tr>
 
                 <tr ng-repeat="data in datalist">
                     <td>{{data.location}}</td>
-                    <td>{{data.coordinates.latitude+','+data.coordinates.longitude}}</td>
-                    <td>{{data.parameter}}</td>
-                    <td>{{data.value}}</td>
-                    <td>{{data.date.utc}}</td>
+                    <td>{{data.parameters[0].value}}</td>
+                    <td>{{data.parameters[1].value}}</td>
+                    <td>{{data.parameters[2].value}}</td>
+                    <td>{{data.parameters[3].value}}</td>
+                    <td>{{data.parameters[4].value}}</td>
+                    <td>{{data.parameters[5].value}}</td>
+                    <td>{{data.parameters[6].value}}</td>
                 </tr>
+
 
             </table>
         </div>
