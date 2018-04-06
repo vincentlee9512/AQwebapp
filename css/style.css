@@ -5,6 +5,7 @@
 
 .container{
     margin-top: 2rem;
+    margin-bottom: 2rem;
 }
 
 #mapsearch{
@@ -25,5 +26,8 @@
 
 #particles{
     margin-bottom: 2rem;
+}
 
+button{
+    margin-left: 10px;
 }

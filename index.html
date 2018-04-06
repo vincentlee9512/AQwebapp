@@ -41,54 +41,48 @@
             <div id="mapCenter"></div>
 
         </div>
-        <button ng-click="mapCtrl.sortList(1);">pm2.5 increasing</button>
-        <button ng-click="mapCtrl.sortList(2);">pm2.5 decreasing</button>
-        <button ng-click="mapCtrl.sortList(3);">pm10 increasing</button>
-        <button ng-click="mapCtrl.sortList(4);">pm10 decreasing</button>
-        <button ng-click="mapCtrl.sortList(5);">co increasing</button>
-        <button ng-click="mapCtrl.sortList(6);">co decreasing</button>
-        <button ng-click="mapCtrl.sortList(7);">bc increasing</button>
-        <button ng-click="mapCtrl.sortList(8);">bc decreasing</button>
-        <button ng-click="mapCtrl.sortList(9);">o3 increasing</button>
-        <button ng-click="mapCtrl.sortList(10);">o3 decreasing</button>
-        <button ng-click="mapCtrl.sortList(11);">so2 increasing</button>
-        <button ng-click="mapCtrl.sortList(12);">so2 decreasing</button>
-        <button ng-click="mapCtrl.sortList(13);">no2 increasing</button>
-        <button ng-click="mapCtrl.sortList(14);">no2 decreasing</button>
 
+
+        <h4>Filter Data:</h4>
         <form ng-submit="mapCtrl.onlyShow();" novalidate>
-            <select ng-model="mapCtrl.sortRequest.type" required>
-                <option value="0">pm2.5</option>
-                <option value="1">pm10</option>
-                <option value="2">co</option>
-                <option value="3">bc</option>
-                <option value="4">o3</option>
-                <option value="5">so2</option>
-                <option value="6">no2</option>
-            </select>
+            <div class="row">
+                <select class="form-control col-5" ng-model="mapCtrl.sortRequest.type" required>
+                    <option value="0">pm2.5</option>
+                    <option value="1">pm10</option>
+                    <option value="2">co</option>
+                    <option value="3">bc</option>
+                    <option value="4">o3</option>
+                    <option value="5">so2</option>
+                    <option value="6">no2</option>
+                </select>
 
-            <select ng-model="mapCtrl.sortRequest.operator" required>
-                <option value="largerequal"> >= </option>
-                <option value="lessequal"> <= </option>
-            </select>
+                <select class="form-control col-2" ng-model="mapCtrl.sortRequest.operator" required>
+                    <option value="largerequal"> >= </option>
+                    <option value="lessequal"> <= </option>
+                </select>
 
-            <input ng-model="mapCtrl.sortRequest.value" type="number" required>
+                <input class="form-control col-2" ng-model="mapCtrl.sortRequest.value" type="number" required>
 
-            <button type="sumbit" value="submit" >show</button>
-            <button value="reset" ng-click="mapCtrl.sortRequest = {};">reset</button>
+                <button type="sumbit" value="submit" class="form-control col-1">show</button>
+                <button value="reset" ng-click="mapCtrl.sortRequest = {};" class="form-control col-1">reset</button>
+            </div>
         </form>
 
         <div id="airTable">
             <table class="table">
                 <tr>
                     <th>Location</th>
-                    <th>pm2.5</th>
-                    <th>pm10</th>
-                    <th>co</th>
-                    <th>bc</th>
-                    <th>o3</th>
-                    <th>so2</th>
-                    <th>no2</th>
+                    <th>pm2.5<button ng-click="mapCtrl.sortList(1);">&#8593;</button><button ng-click="mapCtrl.sortList(2);">&#8595;</button></th>
+                    <th>pm10<button ng-click="mapCtrl.sortList(3);">&#8593;</button><button ng-click="mapCtrl.sortList(4);">&#8595;</button></th>
+                    <th>co<button ng-click="mapCtrl.sortList(5);">&#8593;</button><button ng-click="mapCtrl.sortList(6);">&#8595;</button></th>
+                    <th>bc<button ng-click="mapCtrl.sortList(7);">&#8593;</button>
+                        <button ng-click="mapCtrl.sortList(8);">&#8595;</button></th>
+                    <th>o3<button ng-click="mapCtrl.sortList(9);">&#8593;</button>
+                        <button ng-click="mapCtrl.sortList(10);">&#8595;</button></th>
+                    <th>so2                        <button ng-click="mapCtrl.sortList(11);">&#8593;</button>
+                        <button ng-click="mapCtrl.sortList(12);">&#8595;</button></th>
+                    <th>no2<button ng-click="mapCtrl.sortList(13);">&#8593;</button>
+                        <button ng-click="mapCtrl.sortList(14);">&#8595;</button></th>
                 </tr>
 
                 <tr ng-repeat="data in datalist">
